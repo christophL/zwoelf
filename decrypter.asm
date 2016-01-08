@@ -10,15 +10,13 @@ store_last_arg:
     dec al
     mov byte [rsp], al
 
-push rbp
-mov rax,0x4028a0         ;the start of the code section
+mov rax,###start###         ;the start of the code section
 xor rcx, rcx
 loop:
     xor byte [rax+rcx], dl
     inc rcx
-    cmp rcx,0xff09      ;the size of the code section to decrypt
+    cmp rcx,###size###      ;the size of the code section to decrypt
     jne loop
-pop rbp
 xor rdx, rdx                ;not resetting this causes a segfault
-mov rax,0x404840
-jmp rax        ;the original return address
+mov rax,###return###
+jmp rax       ;the original return address
