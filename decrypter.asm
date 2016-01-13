@@ -18,5 +18,6 @@ loop:
     cmp rcx,###size###      ;the size of the code section to decrypt
     jne loop
 xor rdx, rdx                ;not resetting this causes a segfault
-mov rax,###return###
-jmp rax       ;the original return address
+xor rax, rax
+mov rbp,###return###
+jmp rbp       ;the original return address

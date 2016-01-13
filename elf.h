@@ -16,7 +16,11 @@ typedef struct {
     Elf64_Phdr* phdr_table;
     Elf64_Shdr* shdr_table;
     Elf64_Phdr* note;
+    Elf64_Phdr* load_rw;
     Elf64_Shdr* text;
+    Elf64_Shdr* bss;
+    Elf64_Shdr* rela_dyn;
+    Elf64_Shdr* dynsym;
 } elf_file;
 
 
