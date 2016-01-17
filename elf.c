@@ -124,7 +124,7 @@ static void inject_decrypter(elf_file* file) {
     printf("Decryption code injected into NOTE segment.\n");
 }
 
-void elf_encrypt(elf_file* file) {
+void elf_encrypt(elf_file* file, uint8_t* key) {
     if(file->text == NULL) {
         printf("Error: text section not loaded, file needs to be parsed first.\n");
         return;
@@ -132,7 +132,8 @@ void elf_encrypt(elf_file* file) {
     
     uint8_t* start = file->data.mem + file->text->sh_offset;
     size_t size = file->text->sh_size;
-    encrypt_xor(start, size, 123);
+    //encrypt_xor(start, size, 123);
+    encrypt_rc4(start, size, key);
     inject_decrypter(file);
     printf("Done.\n");
 }

@@ -23,5 +23,5 @@ typedef struct {
 elf_file elf_open(char* path);
 void elf_load(elf_file* file);
 void elf_prepare(elf_file* file);
-void elf_encrypt(elf_file* file);
+void elf_encrypt(elf_file* file, uint8_t* key);
 void elf_close(elf_file* file);
