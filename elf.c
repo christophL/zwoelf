@@ -82,6 +82,15 @@ static void set_code_writable(elf_file* file) {
     }
 }
 
+static void modify_note(elf_file* file, size_t decrypt_size) {
+    file->note->p_type = PT_LOAD;
+    file->note->p_flags |= PF_X | PF_W;
+    file->note->p_offset = file->data.file_size;
+    file->note->p_vaddr = file->note->p_paddr = 0x6000000 + file->note->p_offset;
+    file->note->p_filesz = file->note->p_memsz = decrypt_size;
+    file->note->p_align = 0x1000;
+}
+
 void elf_prepare(elf_file* file) {
     if(!is_elf64(file)) return;
     if(!is_exec(file)) return;
@@ -90,23 +99,27 @@ void elf_prepare(elf_file* file) {
     if(!find_text_section(file)) return;
     if(!find_note_segment(file)) return;
     set_code_writable(file);
+    
+}
+
+static void append_decrypter(elf_file* file, file_data* decrypter) {
+    int fd = open(file->data.file_name, O_APPEND|O_RDWR, 0);
+    write(fd, decrypter->mem, decrypter->file_size);
+    close(fd);
 }
 
 static void inject_decrypter(elf_file* file) {
-    void* dst_addr = file->data.mem + file->note->p_offset;
     void* code_start = (void*)file->text->sh_addr;
     size_t code_size = file->text->sh_size;
     void* ent_point = (void*)file->ehdr->e_entry;
     file_data decrypter = decrypt_prepare(file->data.file_name, 
                                           code_start, code_size, ent_point);
     
-    memcpy(dst_addr, decrypter.mem, decrypter.file_size);
-    if(file->note->p_filesz < decrypter.file_size) {
-        printf("Warning: decryption code does not fit into NOTE segment, program will probably not run.\n");
-        file->note->p_filesz = decrypter.file_size;
-        file->note->p_memsz = decrypter.file_size;
-    }
+    modify_note(file, decrypter.file_size);
     file->ehdr->e_entry = file->note->p_vaddr;
+    
+    elf_close(file);
+    append_decrypter(file, &decrypter);
     file_close(&decrypter);
     printf("Decryption code injected into NOTE segment.\n");
 }

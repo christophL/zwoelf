@@ -13,6 +13,6 @@ int main(int argc, char **argv) {
     elf_load(&file);
     elf_prepare(&file);
     elf_encrypt(&file);
-    elf_close(&file);
+    
     return 0;
 }
