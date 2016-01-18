@@ -1,6 +1,13 @@
 #include "encrypt.h"
 
 
+/**
+ * Basic byte-wise Xor en/decryption
+ * Arguments:
+ *   buf:  the data to en/decrypt
+ *   size: the size of the data to en/decrypt
+ *   key:  the en/decryption key to use
+ */
 void encrypt_xor(uint8_t* buf, size_t size, uint8_t key) {
     for(size_t i = 0; i < size; i++) {
         buf[i] ^= key;
@@ -18,7 +25,15 @@ static void swap(uint8_t* a, uint8_t* b) {
     *a = *b;
     *b = tmp;
 }
-
+/**
+ * RC4 implementation.
+ * Due to the usage of the key_len function, the key should be a 0 terminated
+ * ascii string.
+ * Arguments:
+ *  buf:  the data to en/decrypt
+ *  size: the size of the data to en/decrypt
+ *  key:  the en/decryption key to use
+ */
 void encrypt_rc4(uint8_t* buf, size_t size, uint8_t* key) {
     uint8_t S[256];
     unsigned i,j,k;
@@ -45,6 +60,7 @@ void encrypt_rc4(uint8_t* buf, size_t size, uint8_t* key) {
     }
 }
 
+//function to obtain decompiled asm code from
 static void test(uint8_t* key) {
     uint8_t S[256];
     unsigned i,j,k;

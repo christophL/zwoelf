@@ -1,5 +1,11 @@
 #include "file.h"
 
+/**
+ * Opens the file at the provided path.
+ * Arguments:
+ *   path: the file path to be opened
+ * Returns: a struct containing file information (mapped address, file name, file size)
+ */
 file_data file_open(char* path) {
     file_data ret;
     if((ret.fd = open(path, O_RDWR, 0)) < 0) {
@@ -18,6 +24,13 @@ file_data file_open(char* path) {
     return ret;
 }
 
+/**
+ * Loads an opened file into memory.
+ * Since the file is loaded using mmap, changes to the mapped memory
+ * will be reflected in the target file as well.
+ * Arguments:
+ *   file: the file to be loaded
+ */
 void file_load(file_data* file) {
     void* mem = mmap(NULL, file->file_size, PROT_READ | PROT_WRITE, MAP_SHARED, file->fd, 0);
     if(mem == MAP_FAILED) {
@@ -27,6 +40,11 @@ void file_load(file_data* file) {
     file->mem = mem;
 }
 
+/**
+ * Closes the provided file.
+ * Arguments:
+ *   file: the file to be closed
+ */
 void file_close(file_data* file) {
     if(close(file->fd) < 0) {
         perror("Could not close target file descriptor.");
